@@ -266,7 +266,7 @@ fn truncate(s: &str, max_chars: usize) -> String {
 }
 
 pub async fn deliver_updates() {
-    let mut interval = time::interval(std::time::Duration::from_secs(60));
+    let mut interval = time::interval(std::time::Duration::from_secs(10));
     loop {
         interval.tick().await;
         match DeliverJob::new().execute() {
