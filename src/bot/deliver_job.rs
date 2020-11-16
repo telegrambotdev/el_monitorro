@@ -146,7 +146,7 @@ async fn deliver_subscription_updates(
         messages.reverse();
 
         for message in messages {
-            let ten = time::Duration::from_millis(100);
+            let ten = time::Duration::from_millis(1000);
 
             thread::sleep(ten);
 
