@@ -73,7 +73,7 @@ impl DeliverJob {
             total_number += current_subscriptions.len();
 
             for subscription in current_subscriptions {
-                runtime.spawn(async move { deliver_subscription_updates(subscription).await });
+                runtime.spawn(deliver_subscription_updates(subscription));
             }
         }
 
