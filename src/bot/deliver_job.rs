@@ -13,8 +13,6 @@ use htmlescape::decode_html;
 use serde_json::value::Map;
 
 use diesel::result::Error;
-use std::thread;
-use tokio::runtime::Builder;
 use tokio::time;
 
 pub struct DeliverJob {}
@@ -56,11 +54,6 @@ impl DeliverJob {
 
         log::info!("Started delivering feed items");
 
-        let runtime = Builder::new_multi_thread()
-            .worker_threads(4)
-            .build()
-            .unwrap();
-
         loop {
             current_subscriptions = telegram::fetch_subscriptions(&db_connection, page, 1000)?;
 
@@ -73,7 +66,7 @@ impl DeliverJob {
             total_number += current_subscriptions.len();
 
             for subscription in current_subscriptions {
-                runtime.spawn(deliver_subscription_updates(subscription));
+                tokio::spawn(deliver_subscription_updates(subscription));
             }
         }
 
@@ -272,18 +265,14 @@ fn truncate(s: &str, max_chars: usize) -> String {
     }
 }
 
-#[tokio::main]
 pub async fn deliver_updates() {
     let mut interval = time::interval(std::time::Duration::from_secs(60));
     loop {
         interval.tick().await;
-
-        thread::spawn(|| match DeliverJob::new().execute() {
+        match DeliverJob::new().execute() {
             Err(error) => log::error!("Failed to send updates: {}", error.msg),
             Ok(_) => (),
-        })
-        .join()
-        .expect("Thread panicked")
+        }
     }
 }
 
