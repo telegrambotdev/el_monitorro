@@ -146,6 +146,10 @@ async fn deliver_subscription_updates(
         messages.reverse();
 
         for message in messages {
+            let ten = time::Duration::from_millis(50);
+
+            thread::sleep(ten);
+
             match api::send_message(chat_id, message).await {
                 Ok(_) => (),
                 Err(error) => {
