@@ -15,6 +15,8 @@ use serde_json::value::Map;
 use diesel::result::Error;
 use tokio::time;
 
+use std::thread;
+
 pub struct DeliverJob {}
 
 pub struct DeliverJobError {
@@ -55,13 +57,17 @@ impl DeliverJob {
         log::info!("Started delivering feed items");
 
         loop {
-            current_subscriptions = telegram::fetch_subscriptions(&db_connection, page, 1000)?;
+            current_subscriptions = telegram::fetch_subscriptions(&db_connection, page, 5)?;
 
             page += 1;
 
             if current_subscriptions.is_empty() {
                 break;
             }
+
+            let ten = time::Duration::from_secs(10);
+
+            thread::sleep(ten);
 
             total_number += current_subscriptions.len();
 
@@ -266,7 +272,7 @@ fn truncate(s: &str, max_chars: usize) -> String {
 }
 
 pub async fn deliver_updates() {
-    let mut interval = time::interval(std::time::Duration::from_secs(10));
+    let mut interval = time::interval(std::time::Duration::from_secs(60 * 30));
     loop {
         interval.tick().await;
         match DeliverJob::new().execute() {

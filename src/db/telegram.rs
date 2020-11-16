@@ -177,7 +177,7 @@ pub fn find_undelivered_feed_items(
 ) -> Result<Vec<FeedItem>, Error> {
     let last_delivered_at = match subscription.last_delivered_at {
         Some(value) => value,
-        None => db::current_time() - Duration::minutes(5),
+        None => db::current_time() - Duration::days(365),
     };
 
     feed_items::table
