@@ -88,10 +88,10 @@ pub fn find_unsynced_feeds(conn: &PgConnection, page: i64, count: i64) -> Result
     let offset = (page - 1) * count;
 
     feeds::table
-        .inner_join(telegram_subscriptions::table)
+        // .inner_join(telegram_subscriptions::table)
         .select(feeds::id)
         .order(feeds::id)
-        .distinct()
+        // .distinct()
         .limit(count)
         .offset(offset)
         .load::<i64>(conn)
