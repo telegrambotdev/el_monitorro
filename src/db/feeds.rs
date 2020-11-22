@@ -84,18 +84,11 @@ pub fn remove_feed(conn: &PgConnection, feed_id: i64) -> Result<usize, Error> {
     diesel::delete(record_query).execute(conn)
 }
 
-pub fn find_unsynced_feeds(
-    conn: &PgConnection,
-    last_updated_at: DateTime<Utc>,
-    page: i64,
-    count: i64,
-) -> Result<Vec<i64>, Error> {
+pub fn find_unsynced_feeds(conn: &PgConnection, page: i64, count: i64) -> Result<Vec<i64>, Error> {
     let offset = (page - 1) * count;
 
     feeds::table
         .inner_join(telegram_subscriptions::table)
-        .filter(feeds::synced_at.lt(last_updated_at))
-        .or_filter(feeds::synced_at.is_null())
         .select(feeds::id)
         .order(feeds::id)
         .distinct()

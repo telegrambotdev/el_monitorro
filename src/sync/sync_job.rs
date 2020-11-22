@@ -35,10 +35,8 @@ impl SyncJob {
 
         let mut total_number = 0;
 
-        let last_synced_at = db::current_time();
         loop {
-            unsynced_feed_ids =
-                feeds::find_unsynced_feeds(&db_connection, last_synced_at, page, 100)?;
+            unsynced_feed_ids = feeds::find_unsynced_feeds(&db_connection, page, 100)?;
 
             page += 1;
 
